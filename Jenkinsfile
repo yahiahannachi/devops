@@ -74,7 +74,7 @@ pipeline {
 
                 sh 'docker rm myapp || true'
 
-                sh 'docker run -d --name myapp -p 8080:8080 yahiahannachi/alpine:1.0.0'
+                sh 'docker run -d --name myapp -p 9090:8080 yahiahannachi/alpine:1.0.0'
 
             }
 
