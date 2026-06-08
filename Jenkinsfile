@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven-3.9.6'
-    }
+tools {
+    maven 'M2_HOME'
+}
 
     environment {
         SONAR_PROJECT_KEY = 'devops-project'
