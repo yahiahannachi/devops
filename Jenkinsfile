@@ -5,6 +5,10 @@ pipeline {
         maven 'Maven-3.9'
     }
 
+    environment {
+        SONAR_PROJECT_KEY = 'devops-project'
+    }
+
     stages {
 
         stage('GIT') {
@@ -17,6 +21,26 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                    -Dsonar.projectName=DevOpsProject
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
