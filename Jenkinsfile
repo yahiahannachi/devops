@@ -27,11 +27,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '''
+                    sh """
                     mvn sonar:sonar \
-                    -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                     -Dsonar.projectName=DevOpsProject
-                    '''
+                    """
                 }
             }
         }
@@ -46,7 +46,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t yahiahannachi/alpine:1.0.0 .'
+                sh 'docker build -t yahiahannachi/devops-project:1.0.0 .'
             }
         }
 
@@ -59,7 +59,7 @@ pipeline {
                 )]) {
                     sh '''
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    docker push yahiahannachi/alpine:1.0.0
+                    docker push yahiahannachi/devops-project:1.0.0
                     '''
                 }
             }
@@ -70,7 +70,7 @@ pipeline {
                 sh '''
                 docker stop myapp || true
                 docker rm myapp || true
-                docker run -d --name myapp -p 9090:8080 yahiahannachi/alpine:1.0.0
+                docker run -d --name myapp -p 9090:8080 yahiahannachi/devops-project:1.0.0
                 '''
             }
         }
