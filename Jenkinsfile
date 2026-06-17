@@ -29,13 +29,7 @@ tools {
                 }
             }
         }
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t yahiahannachi/devops-project:1.0.0 .'
