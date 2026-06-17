@@ -18,10 +18,6 @@ public class DepartmentService implements IDepartmentService {
         return departmentRepository.findAll();
     }
 
-    @Override
-    public Department getDepartmentById(Long idDepartment) {
-        return departmentRepository.findById(idDepartment).get();
-    }
 
     @Override
     public Department saveDepartment(Department department) {
