@@ -1,29 +1,23 @@
 pipeline {
     agent any
-
 tools {
     maven 'M2_HOME'
 }
-
     environment {
         SONAR_PROJECT_KEY = 'devops-project'
     }
-
     stages {
-
         stage('GIT') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/yahiahannachi/devops.git'
             }
         }
-
         stage('Build') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
         }
-
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
@@ -35,7 +29,6 @@ tools {
                 }
             }
         }
-
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
@@ -43,13 +36,11 @@ tools {
                 }
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t yahiahannachi/devops-project:1.0.0 .'
             }
         }
-
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
@@ -64,13 +55,11 @@ tools {
                 }
             }
         }
-
-        stage('Deploy Container') {
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                docker stop myapp || true
-                docker rm myapp || true
-                docker run -d --name myapp -p 9090:8080 yahiahannachi/devops-project:1.0.0
+                kubectl set image deployment/studentmang-app studentmang-app=yahiahannachi/devops-project:1.0.0 -n devops
+                kubectl rollout status deployment/studentmang-app -n devops --timeout=120s
                 '''
             }
         }
