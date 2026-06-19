@@ -49,13 +49,34 @@ tools {
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+  stage('Kubernetes Deploy') {
             steps {
                 sh '''
-                kubectl set image deployment/studentmang-app studentmang-app=yahiahannachi/devops-project:1.0.0 -n devops
-                kubectl rollout status deployment/studentmang-app -n devops --timeout=120s
+                echo "=== Création du Namespace devops si nécessaire ==="
+                kubectl create namespace devops --dry-run=client -o yaml | kubectl apply -f -
+
+                echo "=== Déploiement des Manifests k8s ==="
+                kubectl apply -f k8s/mysql-deployment.yaml
+                kubectl apply -f k8s/sonarqube-deployment.yaml
+                kubectl apply -f k8s/spring-deployment.yaml
+
+                echo "=== Forcer la mise à jour de l'image de l'application ==="
+                kubectl rollout restart deployment/studentmang-app -n devops
                 '''
             }
         }
+
+        stage('Kubernetes Status') {
+            steps {
+                sh '''
+                echo "=== Vérification de l'état des Pods dans devops ==="
+                kubectl get pods -n devops
+
+                echo "=== Vérification des Services exposés ==="
+                kubectl get svc -n devops
+                '''
+            }
+        }
+    }
     }
 }
